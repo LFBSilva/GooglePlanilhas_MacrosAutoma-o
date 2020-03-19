@@ -1,0 +1,72 @@
+/** @OnlyCurrentDoc */
+
+
+//Função para apagar conteúdos dado um determinado Range da Planilha
+
+
+function ApagarConteudoFeito() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('M22:R30').activate();
+  spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
+  spreadsheet.getRange('M38:R38').activate();
+  spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
+};
+
+
+//Função para apagar conteúdos dado um determinado Range da Planilha de acordo com o que está escrito pela 
+
+
+function ApagarPendentesFeitos(){
+  var app = SpreadsheetApp;
+  var spreedsheet = app.getActiveSpreadsheet();
+  var sheet = app.getActiveSheet();
+  
+  for (i = 46; i < 60; i++){
+    var selection = sheet.getRange(i, 13).getValue();
+    if (selection !== "Ainda não foi disponibilizado"){
+     sheet.deleteRow(i);
+    } 
+  }
+}
+
+
+function CopiarConteudoPendente(){
+  var app = SpreadsheetApp;
+  var spreedsheet = app.getActiveSpreadsheet();
+  var sheet = app.getActiveSheet();
+  
+  for (j = 45; j < 55; j++){
+    for (i = 22; i < 39; i++){    
+      var selection = sheet.getRange(i, 13).getValue();
+      if (selection === "Ainda não foi disponibilizado"){
+        var spreadsheet = SpreadsheetApp.getActive();
+        var teste = i + ":"+i;
+        var selection2 = sheet.getRange(j, 2).getValue();
+        
+       if (selection2 == 0){        
+          spreadsheet.getRange(j+':'+j).activate();
+          spreadsheet.getRange(teste).copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+          spreadsheet.getRange('M' + i + ':R' + i).activate();
+          spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
+       }
+      }
+     }
+    }
+   }
+
+function saveAsSpreadsheet(){ 
+  var sheet = SpreadsheetApp.getActiveSpreadsheet();
+  var range = sheet.getRange('a!A1:AE63');
+  sheet.setNamedRange('buildingNameAddress', range);
+  var TestRange = sheet.getRangeByName('buildingNameAddress').getValues(); 
+  Logger.log(TestRange); 
+  var destFolder = DriveApp.getFolderById("14ml4y8tOMzPu8LBlQhVa4zrUlAzuEehk"); 
+  DriveApp.getFileById(sheet.getId()).makeCopy("Test File", destFolder); 
+}
+  
+function ZerarRelatorio(){
+  ApagarPendentesFeitos();
+  CopiarConteudoPendente();
+  ApagarConteudoFeito();
+  saveAsSpreadsheet();
+}
